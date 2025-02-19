@@ -3,6 +3,9 @@
         android:label="bullet_of_justice"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <uses-permission android:name="android.permission.INTERNET"/>
+        <uses-cleartext-traffic android:usesCleartextTraffic="true"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
