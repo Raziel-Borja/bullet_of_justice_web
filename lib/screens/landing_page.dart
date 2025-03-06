@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 import 'register_page.dart';
+import 'scoreboard_page.dart'; // Importa la página del scoreboard
 
 class LandingPage extends StatelessWidget {
   @override
@@ -26,9 +27,10 @@ class LandingPage extends StatelessWidget {
                     color: Colors.redAccent,
                     shadows: [
                       Shadow(
-                          blurRadius: 10,
-                          color: Colors.black,
-                          offset: Offset(3, 3))
+                        blurRadius: 10,
+                        color: Colors.black,
+                        offset: Offset(3, 3),
+                      ),
                     ],
                   ),
                 ),
@@ -45,9 +47,10 @@ class LandingPage extends StatelessWidget {
                       'Bienvenido a War Game, un juego de estrategia y combate donde lideras tu ejercito hacia la victoria.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                 ),
@@ -57,7 +60,8 @@ class LandingPage extends StatelessWidget {
                     backgroundColor: Colors.redAccent,
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   onPressed: () {
                     Navigator.push(
@@ -76,7 +80,8 @@ class LandingPage extends StatelessWidget {
                     backgroundColor: Colors.blueAccent,
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   onPressed: () {
                     Navigator.push(
@@ -86,6 +91,27 @@ class LandingPage extends StatelessWidget {
                   },
                   child: Text(
                     'REGISTER',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SizedBox(height: 10),
+                // 🔥 Nuevo botón para ir al scoreboard
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.greenAccent,
+                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ScoreboardPage()),
+                    );
+                  },
+                  child: Text(
+                    'SCOREBOARD',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),

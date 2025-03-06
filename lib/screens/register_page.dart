@@ -8,52 +8,67 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController gamertagController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   bool isLoading = false;
 
-  Future<void> registerUser() async {
+  // Función para realizar la solicitud HTTP
+  Future<http.Response> registerUserAPI(
+      String username, String password) async {
     final String apiUrl =
-        "http://192.168.1.72:3000/api/users"; // Cambia esto con tu URL real
+        "https://latest-api-one.vercel.app/api/register"; // Cambia a 10.0.2.2 para Android Emulator
 
-    final Map<String, String> userData = {
-      "email": emailController.text,
-      "gamertag": gamertagController.text,
-      "password": passwordController.text,
-    };
+    return http.post(
+      Uri.parse(apiUrl),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'username': username,
+        'password': password,
+      }),
+    );
+  }
 
+  Future<void> registerUser() async {
     setState(() {
       isLoading = true;
     });
 
     try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(userData),
+      final response = await registerUserAPI(
+        usernameController.text,
+        passwordController.text,
       );
 
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      // Depuración: Imprime el código de estado y la respuesta
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
 
       if (response.statusCode == 201) {
         // Registro exitoso
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Registro exitoso, ahora inicia sesión.")),
         );
-        Navigator.pop(context);
+        Navigator.pop(context); // Regresa a la página anterior (login)
       } else {
         // Mostrar error devuelto por la API
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(responseData["message"] ?? "Error al registrar")),
+            content: Text(responseData["error"] ?? "Error al registrar"),
+          ),
         );
       }
     } catch (e) {
+      // Manejo de errores de conexión o excepciones inesperadas
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error de conexión con la API")),
+        SnackBar(
+          content: Text("Error de conexión: ${e.toString()}"),
+        ),
       );
+      print("Error details: $e"); // Imprime el error en la consola
     } finally {
       setState(() {
         isLoading = false;
@@ -79,15 +94,9 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               SizedBox(height: 20),
               TextField(
-                controller: emailController,
+                controller: usernameController,
                 decoration: InputDecoration(
-                    labelText: 'Email', border: OutlineInputBorder()),
-              ),
-              SizedBox(height: 20),
-              TextField(
-                controller: gamertagController,
-                decoration: InputDecoration(
-                    labelText: 'Gamertag', border: OutlineInputBorder()),
+                    labelText: 'Username', border: OutlineInputBorder()),
               ),
               SizedBox(height: 20),
               TextField(
@@ -108,7 +117,10 @@ class _RegisterPageState extends State<RegisterPage> {
                             borderRadius: BorderRadius.circular(10)),
                       ),
                       onPressed: registerUser,
-                      child: Text('Register', style: TextStyle(fontSize: 18)),
+                      child: Text(
+                        'Register',
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ),
             ],
           ),

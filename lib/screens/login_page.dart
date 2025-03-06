@@ -9,36 +9,35 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController emailController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool isLoading = false;
 
   Future<void> login() async {
     setState(() => isLoading = true);
 
-    String email = emailController.text.trim();
-    String apiUrl =
-        "http://192.168.1.72:3000/api/users?email=$email"; // Reemplaza con tu URL real
+    String username = usernameController.text.trim();
+    String password = passwordController.text.trim();
+    String apiUrl = "https://latest-api-one.vercel.app/api/login";
 
     try {
-      final response = await http.get(Uri.parse(apiUrl));
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"username": username, "password": password}),
+      );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+      print("🔍 API Response: ${response.body}"); // 👀 Depuración
 
-        if (data != null && data['password'] == passwordController.text) {
-          // ✅ Credenciales correctas → Ir a HomePage
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => HomePage()),
-          );
-        } else {
-          // ❌ Contraseña incorrecta
-          showError("Contraseña incorrecta.");
-        }
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data["success"] == true) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
       } else {
-        // ❌ Usuario no encontrado
-        showError("Usuario no encontrado.");
+        showError(data["error"] ?? "Error desconocido.");
       }
     } catch (error) {
       showError("Error de conexión.");
@@ -50,8 +49,9 @@ class _LoginPageState extends State<LoginPage> {
   void showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-          content: Text(message, style: TextStyle(color: Colors.white)),
-          backgroundColor: Colors.red),
+        content: Text(message, style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.red,
+      ),
     );
   }
 
@@ -64,20 +64,10 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                'assets/Shooter.jpg',
-                height: 300,
-                width: double.infinity,
-                fit: BoxFit.contain,
-              ),
-            ),
-            SizedBox(height: 20),
             TextField(
-              controller: emailController,
+              controller: usernameController, // ✅ Ahora es "username"
               decoration: InputDecoration(
-                labelText: 'Email or Gamertag',
+                labelText: 'Username', // ✅ Ahora dice "Username"
                 border: OutlineInputBorder(),
               ),
             ),
