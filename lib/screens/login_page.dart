@@ -37,10 +37,10 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(builder: (context) => HomePage()),
         );
       } else {
-        showError(data["error"] ?? "Error desconocido.");
+        showError(data["error"] ?? "Unknown error.");
       }
     } catch (error) {
-      showError("Error de conexión.");
+      showError("Connection error.");
     } finally {
       setState(() => isLoading = false);
     }

@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Bullet For Justice')),
+      appBar: AppBar(title: Text('Bullet 4 Justice')),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,

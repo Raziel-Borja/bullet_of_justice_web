@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 import 'register_page.dart';
-import 'scoreboard_page.dart'; // Importa la página del scoreboard
 
 class LandingPage extends StatelessWidget {
   @override
@@ -20,7 +19,7 @@ class LandingPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Bullet For Justice',
+                  'Bullet 4 Justice',
                   style: TextStyle(
                     fontSize: 50,
                     fontWeight: FontWeight.bold,
@@ -44,7 +43,7 @@ class LandingPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      'Bienvenido a War Game, un juego de estrategia y combate donde lideras tu ejercito hacia la victoria.',
+                      'The battle for justice begins now. Will you stand with Daniel Carter and fight for those who cannot fight for themselves? Or will the weight of war crush your spirit? Bullet 4 Justice is more than just a game—it’s a call to action. Are you ready to answer it?',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
@@ -95,26 +94,6 @@ class LandingPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 10),
-                // 🔥 Nuevo botón para ir al scoreboard
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.greenAccent,
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ScoreboardPage()),
-                    );
-                  },
-                  child: Text(
-                    'SCOREBOARD',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
               ],
             ),
           ),

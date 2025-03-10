@@ -49,7 +49,7 @@ class _RegisterPageState extends State<RegisterPage> {
       if (response.statusCode == 201) {
         // Registro exitoso
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Registro exitoso, ahora inicia sesión.")),
+          SnackBar(content: Text("Register successful, now login.")),
         );
         Navigator.pop(context); // Regresa a la página anterior (login)
       } else {
@@ -57,7 +57,7 @@ class _RegisterPageState extends State<RegisterPage> {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(responseData["error"] ?? "Error al registrar"),
+            content: Text(responseData["error"] ?? "Error while registering"),
           ),
         );
       }
@@ -65,7 +65,7 @@ class _RegisterPageState extends State<RegisterPage> {
       // Manejo de errores de conexión o excepciones inesperadas
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Error de conexión: ${e.toString()}"),
+          content: Text("Connection error: ${e.toString()}"),
         ),
       );
       print("Error details: $e"); // Imprime el error en la consola
