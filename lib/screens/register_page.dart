@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
   @override
   _RegisterPageState createState() => _RegisterPageState();
 }
@@ -16,8 +18,7 @@ class _RegisterPageState extends State<RegisterPage> {
   // Función para realizar la solicitud HTTP
   Future<http.Response> registerUserAPI(
       String username, String password) async {
-    final String apiUrl =
-        "https://latest-api-one.vercel.app/api/register"; // Cambia a 10.0.2.2 para Android Emulator
+    const String apiUrl = "https://latest-api-one.vercel.app/api/register";
 
     return http.post(
       Uri.parse(apiUrl),
@@ -42,33 +43,15 @@ class _RegisterPageState extends State<RegisterPage> {
         passwordController.text,
       );
 
-      // Depuración: Imprime el código de estado y la respuesta
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
-
       if (response.statusCode == 201) {
-        // Registro exitoso
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Register successful, now login.")),
-        );
-        Navigator.pop(context); // Regresa a la página anterior (login)
+        _showSuccessSnackBar("Account created successfully!");
+        Navigator.pop(context);
       } else {
-        // Mostrar error devuelto por la API
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(responseData["error"] ?? "Error while registering"),
-          ),
-        );
+        _showErrorSnackBar(responseData["error"] ?? "Error while registering");
       }
     } catch (e) {
-      // Manejo de errores de conexión o excepciones inesperadas
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Connection error: ${e.toString()}"),
-        ),
-      );
-      print("Error details: $e"); // Imprime el error en la consola
+      _showErrorSnackBar("Connection error: ${e.toString()}");
     } finally {
       setState(() {
         isLoading = false;
@@ -76,53 +59,222 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.redAccent.shade700,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.greenAccent.shade700,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Register')),
-      body: SingleChildScrollView(
+      body: Stack(
+        children: [
+          _buildBackground(),
+          _buildBlurEffect(),
+          _buildContent(),
+          _buildBackButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackground() {
+    return Positioned.fill(
+      child: Image.asset(
+        'assets/background.jpg',
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+
+  Widget _buildBlurEffect() {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black.withOpacity(0.7),
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    return Center(
+      child: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/Shooter.jpg',
-                height: 300,
-                fit: BoxFit.contain,
-              ),
-              SizedBox(height: 20),
-              TextField(
+              _buildTitle(),
+              const SizedBox(height: 30),
+              _buildTextField(
                 controller: usernameController,
-                decoration: InputDecoration(
-                    labelText: 'Username', border: OutlineInputBorder()),
+                label: 'Username',
+                icon: Icons.person_add_alt_1,
               ),
-              SizedBox(height: 20),
-              TextField(
+              const SizedBox(height: 20),
+              _buildTextField(
                 controller: passwordController,
+                label: 'Password',
+                icon: Icons.lock_outline,
                 obscureText: true,
-                decoration: InputDecoration(
-                    labelText: 'Password', border: OutlineInputBorder()),
               ),
-              SizedBox(height: 20),
-              isLoading
-                  ? CircularProgressIndicator()
-                  : ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
-                      onPressed: registerUser,
-                      child: Text(
-                        'Register',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ),
+              const SizedBox(height: 30),
+              isLoading ? _buildLoader() : _buildRegisterButton(),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTitle() {
+    return Column(
+      children: [
+        Image.asset(
+          'assets/Shooter.jpg',
+          height: 120,
+          fit: BoxFit.contain,
+        ),
+        const SizedBox(height: 20),
+        Text(
+          'CREATE ACCOUNT',
+          style: TextStyle(
+            fontFamily: 'Orbitron',
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            letterSpacing: 2,
+            shadows: [
+              Shadow(
+                blurRadius: 20,
+                color: Colors.cyanAccent,
+                offset: Offset(0, 0),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool obscureText = false,
+  }) {
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      style: const TextStyle(color: Colors.white),
+      cursorColor: Colors.cyanAccent,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.white70),
+        prefixIcon: Icon(icon, color: Colors.cyanAccent),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.white24),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.cyanAccent),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.1),
+      ),
+    );
+  }
+
+  Widget _buildRegisterButton() {
+    return GestureDetector(
+      onTap: registerUser,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: 200,
+        height: 55,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Colors.cyanAccent, Colors.blueAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.cyanAccent.withOpacity(0.4),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: Text(
+            'REGISTER',
+            style: TextStyle(
+              fontFamily: 'Orbitron',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoader() {
+    return const CircularProgressIndicator(
+      color: Colors.cyanAccent,
+      strokeWidth: 3,
+    );
+  }
+
+  Widget _buildBackButton() {
+    return Positioned(
+      top: 50,
+      left: 20,
+      child: GestureDetector(
+        onTap: () => Navigator.pop(context),
+        child: Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white.withOpacity(0.1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.cyanAccent.withOpacity(0.6),
+                blurRadius: 20,
+                spreadRadius: -5,
+              ),
+            ],
+          ),
+          child: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.cyanAccent,
+            size: 25,
           ),
         ),
       ),
