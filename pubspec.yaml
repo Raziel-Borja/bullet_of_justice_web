@@ -39,6 +39,8 @@ dependencies:
   lottie: ^3.3.1
   flutter_staggered_animations: ^1.1.1
   google_fonts: ^6.2.1
+  flutter_native_splash: ^2.4.5
+
 
 dev_dependencies:
   flutter_test:
@@ -53,6 +55,12 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+flutter_native_splash:
+  color: "#FF0000"  # Rojo en código hexadecimal
+  image: assets/background.jpg  # Asegúrate de que la imagen existe en la carpeta assets
+  android_12:
+    image: assets/Shooter.jpg
+    icon_background_color: "#FFFFFF"
 
 # The following section is specific to Flutter packages.
 flutter:
