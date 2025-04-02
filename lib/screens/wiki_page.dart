@@ -35,6 +35,11 @@ class WikiPage extends StatelessWidget {
     },
   ];
 
+  void logout(BuildContext context) {
+    print("🔴 Cierre de sesión");
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,6 +55,12 @@ class WikiPage extends StatelessWidget {
           ),
         ),
         centerTitle: true,
+        automaticallyImplyLeading: false, // Elimina la flecha de regreso
+        leading: IconButton(
+          onPressed: () => logout(context),
+          icon: Icon(Icons.power_settings_new, color: Colors.white),
+          tooltip: "Logout",
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -164,6 +175,11 @@ class CharacterDetailPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Text(name, style: GoogleFonts.bebasNeue(color: Colors.white)),
+        automaticallyImplyLeading: false, // Elimina la flecha de regreso
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+        ),
       ),
       body: Center(
         child: Column(

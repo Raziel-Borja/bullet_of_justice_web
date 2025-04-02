@@ -14,6 +14,12 @@ class TipsPage extends StatelessWidget {
     "Always heal yourself before engaging in another fight."
   ];
 
+  void logout(BuildContext context) {
+    // Aquí puedes agregar la lógica de cierre de sesión
+    print("🔴 Cierre de sesión");
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,6 +30,12 @@ class TipsPage extends StatelessWidget {
           'Bullet 4 Justice Tips',
           style:
               TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+        ),
+        automaticallyImplyLeading: false, // Elimina la flecha de regreso
+        leading: IconButton(
+          onPressed: () => logout(context),
+          icon: Icon(Icons.power_settings_new, color: Colors.white),
+          tooltip: "Logout",
         ),
       ),
       body: Container(

@@ -26,8 +26,7 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
     });
 
     try {
-      final response = await http
-          .get(Uri.parse('https://latest-api-one.vercel.app/api/scores'));
+      final response = await http.get(Uri.parse('https://latest-api-one.vercel.app/api/scores'));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> responseBody = jsonDecode(response.body);
@@ -35,11 +34,10 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
         if (responseBody['success'] == true) {
           List<dynamic> data = responseBody['data'];
 
-          List<Map<String, dynamic>> tempPlayers =
-              List<Map<String, dynamic>>.from(data.map((player) => {
-                    'username': player['username'] ?? 'Sin nombre',
-                    'kills': player['kills'] ?? 0,
-                  }));
+          List<Map<String, dynamic>> tempPlayers = List<Map<String, dynamic>>.from(data.map((player) => {
+            'username': player['username'] ?? 'Sin nombre',
+            'kills': player['kills'] ?? 0,
+          }));
 
           tempPlayers.sort((a, b) => b['kills'].compareTo(a['kills']));
 
@@ -64,6 +62,72 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
       });
       print("🔥 Error while obtaining the scores: $e");
     }
+  }
+
+  void logout() {
+    print("Sesión cerrada");
+    Navigator.pop(context); // O cambia esto para redirigir al login
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: Text(
+          'Scoreboard',
+          style: TextStyle(
+            color: Colors.redAccent,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.power_settings_new, color: Colors.white),
+          onPressed: logout,
+          tooltip: "Logout",
+        ),
+        actions: [
+          IconButton(
+            onPressed: fetchScores,
+            icon: Icon(Icons.refresh, color: Colors.white),
+            tooltip: "Update Scores",
+          ),
+        ],
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.black, Colors.redAccent.shade700],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : hasError
+                      ? Center(
+                          child: Text(
+                            "Error while loading the scores",
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                        )
+                      : Expanded(
+                          child: ListView.builder(
+                            itemCount: players.length,
+                            itemBuilder: (context, index) => buildPlayerCard(players[index], index),
+                          ),
+                        ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget buildPlayerCard(Map<String, dynamic> player, int index) {
@@ -149,8 +213,7 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.sentiment_very_dissatisfied_rounded,
-                            color: Colors.redAccent),
+                        Icon(Icons.sentiment_very_dissatisfied_rounded, color: Colors.redAccent),
                         SizedBox(width: 4),
                         Text(
                           '${player['kills']}',
@@ -166,63 +229,6 @@ class _ScoreboardPageState extends State<ScoreboardPage> {
                 ],
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text(
-          'Scoreboard',
-          style: TextStyle(
-            color: Colors.redAccent,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: fetchScores,
-            icon: Icon(Icons.refresh, color: Colors.white),
-            tooltip: "Update",
-          ),
-        ],
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.black, Colors.redAccent.shade700],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : hasError
-                      ? Center(
-                          child: Text(
-                            "Error while loading the scores",
-                            style: TextStyle(color: Colors.white, fontSize: 18),
-                          ),
-                        )
-                      : Expanded(
-                          child: ListView.builder(
-                            itemCount: players.length,
-                            itemBuilder: (context, index) =>
-                                buildPlayerCard(players[index], index),
-                          ),
-                        ),
-            ],
           ),
         ),
       ),

@@ -15,9 +15,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool isLoading = false;
 
-  // Función para realizar la solicitud HTTP
-  Future<http.Response> registerUserAPI(
-      String username, String password) async {
+  // Expresión regular para validar la contraseña
+  bool isValidPassword(String password) {
+    String pattern = r'^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(password);
+  }
+
+  Future<http.Response> registerUserAPI(String username, String password) async {
     const String apiUrl = "https://latest-api-one.vercel.app/api/register";
 
     return http.post(
@@ -33,15 +38,21 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> registerUser() async {
+    String username = usernameController.text.trim();
+    String password = passwordController.text;
+
+    // Validar si la contraseña cumple con los requisitos
+    if (!isValidPassword(password)) {
+      _showErrorSnackBar("Password must be at least 8 characters, include a number and a special character.");
+      return;
+    }
+
     setState(() {
       isLoading = true;
     });
 
     try {
-      final response = await registerUserAPI(
-        usernameController.text,
-        passwordController.text,
-      );
+      final response = await registerUserAPI(username, password);
 
       if (response.statusCode == 201) {
         _showSuccessSnackBar("Account created successfully!");
@@ -62,10 +73,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(color: Colors.white),
-        ),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.redAccent.shade700,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -76,10 +84,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void _showSuccessSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(color: Colors.white),
-        ),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.greenAccent.shade700,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -103,18 +108,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _buildBackground() {
     return Positioned.fill(
-      child: Image.asset(
-        'assets/background.jpg',
-        fit: BoxFit.cover,
-      ),
+      child: Image.asset('assets/background.jpg', fit: BoxFit.cover),
     );
   }
 
   Widget _buildBlurEffect() {
     return Positioned.fill(
-      child: Container(
-        color: Colors.black.withOpacity(0.7),
-      ),
+      child: Container(color: Colors.black.withOpacity(0.7)),
     );
   }
 
@@ -127,18 +127,9 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               _buildTitle(),
               const SizedBox(height: 30),
-              _buildTextField(
-                controller: usernameController,
-                label: 'Username',
-                icon: Icons.person_add_alt_1,
-              ),
+              _buildTextField(controller: usernameController, label: 'Username', icon: Icons.person_add_alt_1),
               const SizedBox(height: 20),
-              _buildTextField(
-                controller: passwordController,
-                label: 'Password',
-                icon: Icons.lock_outline,
-                obscureText: true,
-              ),
+              _buildTextField(controller: passwordController, label: 'Password', icon: Icons.lock_outline, obscureText: true),
               const SizedBox(height: 30),
               isLoading ? _buildLoader() : _buildRegisterButton(),
             ],
@@ -151,11 +142,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildTitle() {
     return Column(
       children: [
-        Image.asset(
-          'assets/Shooter.jpg',
-          height: 120,
-          fit: BoxFit.contain,
-        ),
+        Image.asset('assets/Shooter.jpg', height: 120, fit: BoxFit.contain),
         const SizedBox(height: 20),
         Text(
           'CREATE ACCOUNT',
@@ -165,25 +152,14 @@ class _RegisterPageState extends State<RegisterPage> {
             fontWeight: FontWeight.bold,
             color: Colors.white,
             letterSpacing: 2,
-            shadows: [
-              Shadow(
-                blurRadius: 20,
-                color: Colors.cyanAccent,
-                offset: Offset(0, 0),
-              ),
-            ],
+            shadows: [Shadow(blurRadius: 20, color: Colors.cyanAccent, offset: Offset(0, 0))],
           ),
         ),
       ],
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    bool obscureText = false,
-  }) {
+  Widget _buildTextField({required TextEditingController controller, required String label, required IconData icon, bool obscureText = false}) {
     return TextField(
       controller: controller,
       obscureText: obscureText,
@@ -193,65 +169,15 @@ class _RegisterPageState extends State<RegisterPage> {
         labelText: label,
         labelStyle: TextStyle(color: Colors.white70),
         prefixIcon: Icon(icon, color: Colors.cyanAccent),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.white24),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.cyanAccent),
-          borderRadius: BorderRadius.circular(12),
-        ),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
+        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.cyanAccent), borderRadius: BorderRadius.circular(12)),
         filled: true,
         fillColor: Colors.white.withOpacity(0.1),
       ),
     );
   }
 
-  Widget _buildRegisterButton() {
-    return GestureDetector(
-      onTap: registerUser,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        width: 200,
-        height: 55,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Colors.cyanAccent, Colors.blueAccent],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.cyanAccent.withOpacity(0.4),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: const Center(
-          child: Text(
-            'REGISTER',
-            style: TextStyle(
-              fontFamily: 'Orbitron',
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLoader() {
-    return const CircularProgressIndicator(
-      color: Colors.cyanAccent,
-      strokeWidth: 3,
-    );
-  }
-
-  Widget _buildBackButton() {
+    Widget _buildBackButton() {
     return Positioned(
       top: 50,
       left: 20,
@@ -279,5 +205,29 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
+  }
+
+
+  Widget _buildRegisterButton() {
+    return GestureDetector(
+      onTap: registerUser,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: 200,
+        height: 55,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(colors: [Colors.cyanAccent, Colors.blueAccent], begin: Alignment.topLeft, end: Alignment.bottomRight),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [BoxShadow(color: Colors.cyanAccent.withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 5))],
+        ),
+        child: const Center(
+          child: Text('REGISTER', style: TextStyle(fontFamily: 'Orbitron', fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoader() {
+    return const CircularProgressIndicator(color: Colors.cyanAccent, strokeWidth: 3);
   }
 }
