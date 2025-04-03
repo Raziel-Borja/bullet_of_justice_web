@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'login_page.dart'; // Importa la pantalla de login
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -41,7 +42,6 @@ class _RegisterPageState extends State<RegisterPage> {
     String username = usernameController.text.trim();
     String password = passwordController.text;
 
-    // Validar si la contraseña cumple con los requisitos
     if (!isValidPassword(password)) {
       _showErrorSnackBar("Password must be at least 8 characters, include a number and a special character.");
       return;
@@ -56,7 +56,15 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (response.statusCode == 201) {
         _showSuccessSnackBar("Account created successfully!");
-        Navigator.pop(context);
+
+        // Espera 2 segundos para que el usuario vea el mensaje de éxito antes de redirigir
+        await Future.delayed(const Duration(seconds: 2)); 
+
+        // Redirigir a la pantalla de login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
       } else {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         _showErrorSnackBar(responseData["error"] ?? "Error while registering");
@@ -177,7 +185,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-    Widget _buildBackButton() {
+  Widget _buildBackButton() {
     return Positioned(
       top: 50,
       left: 20,
@@ -206,7 +214,6 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
     );
   }
-
 
   Widget _buildRegisterButton() {
     return GestureDetector(
